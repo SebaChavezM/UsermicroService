@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/usermicroservice.jar app.jar
 
 # Expone el puerto que tu microservicio usa
-EXPOSE 8080
+EXPOSE 8081
 
 # Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
