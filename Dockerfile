@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-alpine
 WORKDIR /app
 
 # Copia el archivo JAR generado por Maven o Gradle al contenedor
-COPY target/usermicroservice.jar app.jar
+COPY target/usermicroservice-0.0.1-SNAPSHOT.jar app.jar
 
 # Expone el puerto que tu microservicio usa
 EXPOSE 8081
