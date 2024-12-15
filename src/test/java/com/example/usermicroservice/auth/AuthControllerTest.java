@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
@@ -54,7 +55,7 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, String>> response = authController.login(loginRequest, session);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Login exitoso", response.getBody().get("message"));
         assertEquals("USER", response.getBody().get("role"));
         verify(session).setAttribute("user", mockUser);
@@ -73,7 +74,7 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, String>> response = authController.login(loginRequest, session);
 
-        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("Credenciales incorrectas", response.getBody().get("message"));
     }
 
@@ -89,11 +90,11 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, Object>> response = authController.checkSession(session);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue((Boolean) response.getBody().get("authenticated"));
-        @SuppressWarnings("unchecked")
         Map<String, Object> user = (Map<String, Object>) response.getBody().get("user");
         assertEquals("John Doe", user.get("name"));
+        assertEquals("test@example.com", user.get("email"));
     }
 
     @Test
@@ -102,7 +103,7 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, Object>> response = authController.checkSession(session);
 
-        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertFalse((Boolean) response.getBody().get("authenticated"));
         assertEquals("No hay sesión activa", response.getBody().get("message"));
     }
@@ -111,7 +112,7 @@ class AuthControllerTest {
     void testLogout() {
         ResponseEntity<Map<String, String>> response = authController.logout(session);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Sesión cerrada", response.getBody().get("message"));
         verify(session).invalidate();
     }
@@ -128,7 +129,7 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, String>> response = authController.register(registerRequest, bindingResult);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Usuario registrado con éxito", response.getBody().get("message"));
         verify(userRepository).save(any(User.class));
     }
@@ -145,7 +146,7 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, String>> response = authController.register(registerRequest, bindingResult);
 
-        assertEquals(400, response.getStatusCodeValue());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("El correo ya está registrado.", response.getBody().get("message"));
     }
 
@@ -157,13 +158,15 @@ class AuthControllerTest {
         registerRequest.setPassword("");
 
         when(bindingResult.hasErrors()).thenReturn(true);
+
+        // Simular FieldError para evitar NullPointerException
         org.springframework.validation.FieldError fieldError = mock(org.springframework.validation.FieldError.class);
         when(bindingResult.getFieldError()).thenReturn(fieldError);
         when(fieldError.getDefaultMessage()).thenReturn("Datos inválidos");
 
         ResponseEntity<Map<String, String>> response = authController.register(registerRequest, bindingResult);
 
-        assertEquals(400, response.getStatusCodeValue());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Datos inválidos", response.getBody().get("message"));
     }
 
@@ -177,7 +180,7 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, String>> response = authController.forgotPassword(request);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Se ha enviado un correo para restablecer tu contraseña.", response.getBody().get("message"));
     }
 
@@ -191,7 +194,7 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, String>> response = authController.forgotPassword(request);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("El correo no está registrado.", response.getBody().get("message"));
     }
 }

@@ -169,4 +169,60 @@ public class AuthController {
         }
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<Map<String, String>> updateUser(@Valid @RequestBody UpdateUserRequest updateRequest, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "No hay sesión activa."));
+        }
+
+        // Buscar el usuario en la base de datos
+        Optional<User> userOptional = userRepository.findById(currentUser.getId());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // Actualizar los datos del usuario
+            user.setName(updateRequest.getName());
+            user.setDireccion(updateRequest.getDireccion());
+            user.setTelefono(updateRequest.getTelefono());
+            userRepository.save(user);
+
+            // Actualizar los datos en la sesión
+            session.setAttribute("user", user);
+
+            return ResponseEntity.ok(Map.of("message", "Datos actualizados correctamente."));
+        }
+
+        return ResponseEntity.status(404).body(Map.of("message", "Usuario no encontrado."));
+    }
+
+    static class UpdateUserRequest {
+        private String name;
+        private String direccion;
+        private String telefono;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDireccion() {
+            return direccion;
+        }
+
+        public void setDireccion(String direccion) {
+            this.direccion = direccion;
+        }
+
+        public String getTelefono() {
+            return telefono;
+        }
+
+        public void setTelefono(String telefono) {
+            this.telefono = telefono;
+        }
+    }
+
 }

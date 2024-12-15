@@ -4,11 +4,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import java.io.Serializable; // Importar Serializable
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable { // Implementar Serializable
+
+    private static final long serialVersionUID = 1L; // Definir serialVersionUID
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,6 +32,12 @@ public class User {
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "direccion", length = 255) // Nueva columna para la dirección
+    private String direccion;
+
+    @Column(name = "telefono", length = 20) // Nueva columna para el teléfono
+    private String telefono;
 
     // Getters y Setters
     public Long getId() {
@@ -76,5 +86,21 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 }

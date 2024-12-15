@@ -11,10 +11,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Desactiva CSRF para simplificar pruebas
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**").permitAll() // Permitir acceso a todas las rutas de /api
-                .anyRequest().authenticated() // Requiere autenticación para otros endpoints
+                .requestMatchers("/api/**").permitAll()
+                .anyRequest().authenticated()
+                
             );
 
         return http.build();
